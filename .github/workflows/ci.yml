@@ -40,21 +40,22 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       # Publish the final executables
-      - name: Publish
-        run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            dotnet publish GameSpaceManager/GameSpaceManager.csproj \
-              -c Release \
-              -f net9.0 \
-              -r linux-x64 \
-              -o ./publish/linux
-          else
-            dotnet publish GameSpaceManager/GameSpaceManager.csproj \
-              -c Release \
-              -f net9.0-desktop \
-              -r win-x64 \
-              -o ./publish/windows
-          fi
+      - name: Publish Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet publish GameSpaceManager/GameSpaceManager.csproj \
+          -c Release \
+          -f net9.0 \
+          -r linux-x64 \
+          -o ./publish/linux
+
+      - name: Publish Windows
+        if: matrix.os == 'windows-latest'
+        run: dotnet publish GameSpaceManager/GameSpaceManager.csproj `
+          -c Release `
+          -f net9.0-desktop `
+          -r win-x64 `
+          -o ./publish/windows
+        shell: pwsh
 
       # Upload artifacts for each OS
       - name: Upload Artifacts
