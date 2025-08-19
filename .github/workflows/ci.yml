@@ -42,20 +42,23 @@ jobs:
       # Publish the final executables
       - name: Publish Linux
         if: matrix.os == 'ubuntu-latest'
-        run: dotnet publish GameSpaceManager/GameSpaceManager.csproj \
-          -c Release \
-          -f net9.0 \
-          -r linux-x64 \
-          -o ./publish/linux
+        run: |
+          dotnet publish GameSpaceManager/GameSpaceManager.csproj \
+            -c Release \
+            -f net9.0 \
+            -r linux-x64 \
+            -o ./publish/linux
+      
 
       - name: Publish Windows
         if: matrix.os == 'windows-latest'
-        run: dotnet publish GameSpaceManager/GameSpaceManager.csproj `
-          -c Release `
-          -f net9.0-desktop `
-          -r win-x64 `
-          -o ./publish/windows
         shell: pwsh
+        run: >
+          dotnet publish GameSpaceManager/GameSpaceManager.csproj
+          -c Release
+          -f net9.0-desktop
+          -r win-x64
+          -o ./publish/windows
 
       # Upload artifacts for each OS
       - name: Upload Artifacts
