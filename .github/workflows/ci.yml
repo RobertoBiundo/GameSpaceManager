@@ -43,9 +43,17 @@ jobs:
       - name: Publish
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            dotnet publish GameSpaceManager -c Release -r linux-x64 --self-contained false -o ./publish/linux
+            dotnet publish GameSpaceManager/GameSpaceManager/GameSpaceManager.csproj \
+              -c Release \
+              -f net9.0 \
+              -r linux-x64 \
+              -o ./publish/linux
           else
-            dotnet publish GameSpaceManager -c Release -r win-x64 --self-contained false -o ./publish/windows
+            dotnet publish GameSpaceManager/GameSpaceManager/GameSpaceManager.csproj \
+              -c Release \
+              -f net9.0-desktop \
+              -r win-x64 \
+              -o ./publish/windows
           fi
 
       # Upload artifacts for each OS
