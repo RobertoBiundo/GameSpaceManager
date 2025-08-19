@@ -43,13 +43,13 @@ jobs:
       - name: Publish
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            dotnet publish GameSpaceManager/GameSpaceManager/GameSpaceManager.csproj \
+            dotnet publish GameSpaceManager/GameSpaceManager.csproj \
               -c Release \
               -f net9.0 \
               -r linux-x64 \
               -o ./publish/linux
           else
-            dotnet publish GameSpaceManager/GameSpaceManager/GameSpaceManager.csproj \
+            dotnet publish GameSpaceManager/GameSpaceManager.csproj \
               -c Release \
               -f net9.0-desktop \
               -r win-x64 \
