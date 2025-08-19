@@ -40,17 +40,28 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       # Publish the final executables
-      - name: Publish
+      - name: Publish Linux
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            dotnet publish GameSpaceManager -c Release -r linux-x64 --self-contained false -o ./publish/linux
-          else
-            dotnet publish GameSpaceManager -c Release -r win-x64 --self-contained false -o ./publish/windows
-          fi
+          dotnet publish GameSpaceManager/GameSpaceManager.csproj -c Release -f net9.0-desktop -r linux-x64 -p:SelfContained=true -p:PublishSingleFile=true -o ./publish/linux
+
+      - name: Publish Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: >
+          dotnet publish GameSpaceManager/GameSpaceManager.csproj 
+          -c Release
+          -f net9.0-desktop
+          -r win-x64
+          --self-contained true
+          -o ./publish/windows
+          /p:PublishSingleFile=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:EnableCompressionInSingleFile=true
 
       # Upload artifacts for each OS
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: GameSpaceManager-${{ matrix.os }}
-          path: ./publish/${{ matrix.os == 'ubuntu-latest' && 'linux' || 'windows' }}
+          path: ${{ matrix.os == 'ubuntu-latest' && 'publish/linux' || 'publish/windows' }}
