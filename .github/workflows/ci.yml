@@ -50,7 +50,7 @@ jobs:
 
       # Upload artifacts for each OS
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: GameSpaceManager-${{ matrix.os }}
-          path: ./publish/${{ matrix.os == 'ubuntu-latest' && 'linux' || 'windows' }}
+          path: ${{ matrix.os == 'ubuntu-latest' && 'publish/linux' || 'publish/windows' }}
