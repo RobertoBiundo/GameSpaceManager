@@ -43,22 +43,13 @@ jobs:
       - name: Publish Linux
         if: matrix.os == 'ubuntu-latest'
         run: |
-          dotnet publish GameSpaceManager/GameSpaceManager.csproj \
-          -c Release \
-          -f net9.0 \
-          -r linux-x64 \
-          --self-contained true \
-          -o ./publish/linux \
-          /p:PublishSingleFile=true \
-          /p:IncludeNativeLibrariesForSelfExtract=true \
-          /p:EnableCompressionInSingleFile=true
-
+          dotnet publish GameSpaceManager/GameSpaceManager.csproj -c Release -f net9.0-desktop -r linux-x64 -p:SelfContained=true -p:PublishSingleFile=true -o ./publish/linux
 
       - name: Publish Windows
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: >
-          dotnet publish GameSpaceManager/GameSpaceManager.csproj
+          dotnet publish GameSpaceManager/GameSpaceManager.csproj 
           -c Release
           -f net9.0-desktop
           -r win-x64
