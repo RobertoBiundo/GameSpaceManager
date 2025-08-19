@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+      - release/**
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - develop
+      - release/**
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    env:
+      STEP_TIMEOUT_MINUTES: 30  # adjust if needed
+
+    steps:
+      # Checkout the repo
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Install dependencies (custom step you already have)
+      - name: Install Dependencies
+        timeout-minutes: ${{ fromJSON(env.STEP_TIMEOUT_MINUTES) }}
+        uses: "./.github/steps/install_dependencies"
+
+      # Restore NuGet packages
+      - name: Restore Packages
+        run: dotnet restore
+
+      # Build project
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      # Publish the final executables
+      - name: Publish
+        run: |
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            dotnet publish GameSpaceManager -c Release -r linux-x64 --self-contained false -o ./publish/linux
+          else
+            dotnet publish GameSpaceManager -c Release -r win-x64 --self-contained false -o ./publish/windows
+          fi
+
+      # Upload artifacts for each OS
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: GameSpaceManager-${{ matrix.os }}
+          path: ./publish/${{ matrix.os == 'ubuntu-latest' && 'linux' || 'windows' }}

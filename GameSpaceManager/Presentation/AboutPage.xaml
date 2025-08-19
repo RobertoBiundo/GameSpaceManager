@@ -1,0 +1,87 @@
+﻿<Page
+    x:Class="GameSpaceManager.Presentation.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="16">
+
+            <!-- Page Title -->
+            <TextBlock Text="About"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="{ThemeResource PrimaryColor}" />
+
+            <!-- Description -->
+            <TextBlock TextWrapping="Wrap"
+                       FontSize="16">
+                Thanks for using AppSpaceManager! This application is designed to move entire directories to and from a backup location, making it easy to manage your app (or game) space on your disks.
+            </TextBlock>
+
+            <!-- How to Use Header -->
+            <TextBlock Text="How to Use"
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       Foreground="{ThemeResource PrimaryColor}"
+                       Margin="0,16,0,8" />
+
+            <!-- Steps -->
+            <StackPanel Margin="12,0,0,0" Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="1." FontWeight="Bold" Foreground="{ThemeResource PrimaryColor}" FontSize="16" />
+                    <TextBlock Text="Select the source directory you want to move folders from." TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="2." FontWeight="Bold" Foreground="{ThemeResource PrimaryColor}" FontSize="16" />
+                    <TextBlock Text="Select the destination directory where you want to back them up. Make sure they are in a different disk" TextWrapping="Wrap" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="3." FontWeight="Bold" Foreground="{ThemeResource PrimaryColor}" FontSize="16" />
+                    <TextBlock
+                        Text="Use the Manage section to archive or restore folder. Archiving moves folders to the backup location, while restoring moves them back to the original location."
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Reporting an Issue -->
+            <TextBlock Text="Reporting an Issue"
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       Foreground="{ThemeResource PrimaryColor}"
+                       Margin="0,16,0,8" />
+            <TextBlock TextWrapping="Wrap"
+                       Margin="12,0,0,0"
+                       FontSize="16"
+                       Text="If you encounter any issues or have suggestions, please report them on the project's GitHub page" />
+
+            <!-- Donating -->
+            <TextBlock Text="Donating"
+                       FontSize="22"
+                       FontWeight="SemiBold"
+                       Foreground="{ThemeResource PrimaryColor}"
+                       Margin="0,16,0,8" />
+            <TextBlock TextWrapping="Wrap"
+                       Margin="12,0,0,0"
+                       FontSize="16"
+                       Text="If you find this tool useful, consider supporting the project with a donation. Your contributions help keep the project alive and improve it further." />
+            <TextBlock TextWrapping="Wrap"
+                       Margin="12,0,0,0"
+                       FontSize="16"
+                       Text="You can donate via PayPal at: " />
+            <Button Content="Donate via PayPal"
+                    HorizontalAlignment="Left"
+                    Margin="12,0,0,0"
+                    Padding="8,4"
+                    Foreground="White"
+                    Background="{ThemeResource PrimaryColor}"
+                    BorderThickness="0"
+                    CornerRadius="8"
+                    Click="DonateButton_Click" />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

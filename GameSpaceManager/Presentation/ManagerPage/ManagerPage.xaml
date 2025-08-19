@@ -1,0 +1,111 @@
+﻿<Page
+    x:Class="GameSpaceManager.Presentation.ManagerPage.ManagerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:GameSpaceManager.Presentation.ManagerPage"
+    xmlns:converters="clr-namespace:GameSpaceManager.Presentation.Converters"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <converters:ArchiveToSymbolConverter x:Key="ArchiveToSymbolConverter" />
+        <converters:ArchiveToLabelConverter x:Key="ArchiveToLabelConverter" />
+        <converters:ArchiveToBackgroundConverter x:Key="ArchiveToBackgroundConverter"
+                                                 ActiveBrush="{ThemeResource PrimaryColor}"
+                                                 ArchivedBrush="{ThemeResource SecondaryColor}" />
+    </Page.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Page Title -->
+        <TextBlock Text="Manage"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   Foreground="{ThemeResource PrimaryColor}"
+                   Margin="24,24,24,16"
+                   Grid.Row="0" />
+
+        <!-- Folder List with ItemsRepeater -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollMode="Disabled" VerticalScrollMode="Auto" Padding="24,0,24,16">
+            <ItemsRepeater ItemsSource="{x:Bind ViewModel.FolderItems}">
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="local:FolderItemModel">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Margin="0,4"
+                              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                              Padding="24, 16"
+                              CornerRadius="12">
+                            <Grid.Shadow>
+                                <ThemeShadow />
+                            </Grid.Shadow>
+
+                            <!-- Folder name -->
+                            <TextBlock Grid.Column="0"
+                                       Text="{x:Bind Name}"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="Medium"
+                                       Foreground="{x:Bind ArchivePath, Converter={StaticResource ArchiveToBackgroundConverter}}"
+                                       TextTrimming="CharacterEllipsis" />
+
+                            <!-- Folder size -->
+                            <TextBlock Grid.Column="1"
+                                       Text="{x:Bind SizeText, Mode=OneWay}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Foreground="{ThemeResource SecondaryTextFillColorTertiaryBrush}"
+                                       HorizontalAlignment="Right" />
+
+                            <!-- Archive/Restore Button -->
+                            <Button Grid.Column="2"
+                                    Click="ArchiveOrRestore_Click"
+                                    Tag="{x:Bind}"
+                                    Padding="8,4"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    CornerRadius="16"
+                                    HorizontalAlignment="Right">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <SymbolIcon Symbol="{x:Bind ArchivePath, Converter={StaticResource ArchiveToSymbolConverter}}" />
+                                    <TextBlock Text="{x:Bind ArchivePath, Converter={StaticResource ArchiveToLabelConverter}}"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+
+        <!-- Bottom Ribbon -->
+        <Border Background="{ThemeResource SystemChromeMediumColor}" Padding="24" Grid.Row="2">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.DiskInfoModel}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="24" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="local:DiskInfoModel">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <SymbolIcon Symbol="MapDrive" Foreground="{ThemeResource PrimaryColor}" />
+                            <StackPanel>
+                                <TextBlock Text="{x:Bind DisplayName}" FontWeight="Bold" />
+                                <ProgressBar
+                                    Minimum="0"
+                                    Maximum="100"
+                                    Value="{x:Bind UsedPercentage}"
+                                    Width="120"
+                                    Background="{ThemeResource SystemControlBackgroundBaseLowBrush}"
+                                    Foreground="{ThemeResource PrimaryColor}" />
+                                <TextBlock Text="{x:Bind FreeSpaceText}"
+                                           FontSize="12"
+                                           Foreground="{ThemeResource SecondaryColor}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+    </Grid>
+</Page>

@@ -1,0 +1,67 @@
+<Project Sdk="Uno.Sdk">
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFrameworks>net9.0-desktop;net9.0</TargetFrameworks>
+
+        <OutputType>Exe</OutputType>
+        <UnoSingleProject>true</UnoSingleProject>
+
+        <!-- Display name -->
+        <ApplicationTitle>GameSpaceManager</ApplicationTitle>
+        <!-- App Identifier -->
+        <ApplicationId>com.bugbinc.GameSpaceManager</ApplicationId>
+        <!-- Versions -->
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+        <!-- Package Publisher -->
+        <ApplicationPublisher>O=GameSpaceManager</ApplicationPublisher>
+        <!-- Package Description -->
+        <Description>A tool to manage folder and swap them between Disks</Description>
+
+        <!--
+          UnoFeatures let's you quickly add and manage implicit package references based on the features you want to use.
+          https://aka.platform.uno/singleproject-features
+        -->
+        <UnoFeatures>
+            Material;
+            Dsp;
+            Hosting;
+            Toolkit;
+            Logging;
+            LoggingSerilog;
+            Mvvm;
+            Configuration;
+            HttpKiota;
+            Serialization;
+            Localization;
+            Navigation;
+            ThemeService;
+            SkiaRenderer;
+        </UnoFeatures>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug' or '$(IsUiAutomationMappingEnabled)'=='True'">
+        <IsUiAutomationMappingEnabled>True</IsUiAutomationMappingEnabled>
+        <DefineConstants>$(DefineConstants);USE_UITESTS</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Presentation\ManagerPage\ManagerPage.xaml.cs">
+            <DependentUpon>ManagerPage.xaml</DependentUpon>
+            <IsDefaultItem>true</IsDefaultItem>
+        </Compile>
+    </ItemGroup>
+
+</Project>
