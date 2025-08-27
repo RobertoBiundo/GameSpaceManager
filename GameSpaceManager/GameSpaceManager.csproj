@@ -62,6 +62,9 @@
             <DependentUpon>ManagerPage.xaml</DependentUpon>
             <IsDefaultItem>true</IsDefaultItem>
         </Compile>
+        <Compile Update="Presentation\Shared\ProgressDialog.xaml.cs">
+          <IsDefaultItem>true</IsDefaultItem>
+        </Compile>
     </ItemGroup>
 
 </Project>
