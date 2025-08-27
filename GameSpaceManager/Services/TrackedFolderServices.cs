@@ -50,7 +50,10 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
                     Directory.Delete(folderToArchive.FullPath, true);
                 }
             }
+<<<<<<< HEAD
             }
+=======
+>>>>>>> 7955348 (Feature: Added a progress bar when moving files)
         }
         catch (Exception ex)
         {
