@@ -50,17 +50,11 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
                     Directory.Delete(folderToArchive.FullPath, true);
                 }
             }
-                }
-                else
-                {
-                    CopyDirectoryRecursively(folderToArchive.FullPath, archivePath, progressCallback);
-                    Directory.Delete(folderToArchive.FullPath, true);
-                }
+            else
+            {
+                CopyDirectoryRecursively(folderToArchive.FullPath, archivePath, progressCallback);
+                Directory.Delete(folderToArchive.FullPath, true);
             }
-<<<<<<< HEAD
-            }
-=======
->>>>>>> 7955348 (Feature: Added a progress bar when moving files)
         }
         catch (Exception ex)
         {
@@ -72,6 +66,7 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
             progressCallback?.Invoke(100.0);
             return null;
         }
+
         progressCallback?.Invoke(100.0);
         return trackedFolder;
     }
@@ -152,12 +147,14 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
                 copiedFiles++;
                 progressCallback?.Invoke((double) copiedFiles / totalFiles * 100.0);
             }
+
             foreach (var dir in Directory.GetDirectories(src))
             {
                 var destSubDir = Path.Combine(dst, Path.GetFileName(dir));
                 CopyRecursive(dir, destSubDir);
             }
         }
+
         CopyRecursive(sourceDir, destDir);
     }
 }
