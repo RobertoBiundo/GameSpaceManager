@@ -9,7 +9,7 @@ namespace GameSpaceManager.Services;
 public class TrackedFolderServices(IStore store, IDestinationFolderService destinationFolderService) : ITrackedFolderServices
 {
     /// <inheritDoc />
-    public async Task<TrackedFolderEntity?> ArchiveFolder(FolderItemModel folderToArchive)
+    public async Task<TrackedFolderEntity?> ArchiveFolder(FolderItemModel folderToArchive, ITrackedFolderServices.CopyProgressCallback? progressCallback = null)
     {
         var destinationFolder = destinationFolderService.GetDestinationFolder();
 
@@ -34,23 +34,37 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
 
         try
         {
-            // Move the folder to the archive location
             if (Directory.Exists(folderToArchive.FullPath))
-                Directory.Move(folderToArchive.FullPath, archivePath);
+            {
+                // If the source and destination are on the same volume, use Move. Otherwise, copy and delete.
+                var sourceRoot = Path.GetPathRoot(folderToArchive.FullPath);
+                var destRoot = Path.GetPathRoot(archivePath);
+                if (string.Equals(sourceRoot, destRoot, StringComparison.OrdinalIgnoreCase))
+                {
+                    Directory.Move(folderToArchive.FullPath, archivePath);
+                    progressCallback?.Invoke(100.0);
+                }
+                else
+                {
+                    CopyDirectoryRecursively(folderToArchive.FullPath, archivePath, progressCallback);
+                    Directory.Delete(folderToArchive.FullPath, true);
+                }
+            }
         }
         catch
         {
             // Delete the tracked folder entry if the move fails
             store.Remove(trackedFolder);
             await store.SaveAsync();
+            progressCallback?.Invoke(100.0);
             return null;
         }
-
+        progressCallback?.Invoke(100.0);
         return trackedFolder;
     }
 
     /// <inheritDoc />
-    public async Task<bool> RestoreFolder(FolderItemModel folderToRestore)
+    public async Task<bool> RestoreFolder(FolderItemModel folderToRestore, ITrackedFolderServices.CopyProgressCallback? progressCallback = null)
     {
         // Find the tracked folder entity by its ID
         var trackedFolder = await store.TrackedFolderRepository.QueryMany()
@@ -70,11 +84,23 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
             if (Directory.Exists(trackedFolder.OriginalPath))
                 Directory.Delete(trackedFolder.OriginalPath, true);
 
-            // Move the folder back to its original location
-            Directory.Move(trackedFolder.ArchivePath, trackedFolder.OriginalPath);
+            // If the source and destination are on the same volume, use Move. Otherwise, copy and delete.
+            var sourceRoot = Path.GetPathRoot(trackedFolder.ArchivePath);
+            var destRoot = Path.GetPathRoot(trackedFolder.OriginalPath);
+            if (string.Equals(sourceRoot, destRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                Directory.Move(trackedFolder.ArchivePath, trackedFolder.OriginalPath);
+                progressCallback?.Invoke(100.0);
+            }
+            else
+            {
+                CopyDirectoryRecursively(trackedFolder.ArchivePath, trackedFolder.OriginalPath, progressCallback);
+                Directory.Delete(trackedFolder.ArchivePath, true);
+            }
         }
         catch (Exception)
         {
+            progressCallback?.Invoke(100.0);
             return false;
         }
 
@@ -89,5 +115,36 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
     public IQueryable<TrackedFolderEntity> GetTrackedFolders()
     {
         return store.TrackedFolderRepository.QueryMany();
+    }
+
+    /// <summary>
+    ///     A method to copy a directory recursively with progress reporting.
+    /// </summary>
+    /// <param name="sourceDir">The source directory path</param>
+    /// <param name="destDir">The destination directory path</param>
+    /// <param name="progressCallback">The progress callback to report progress percentage</param>
+    private static void CopyDirectoryRecursively(string sourceDir, string destDir, ITrackedFolderServices.CopyProgressCallback? progressCallback = null)
+    {
+        var allFiles = Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories);
+        var totalFiles = allFiles.Length;
+        var copiedFiles = 0;
+
+        void CopyRecursive(string src, string dst)
+        {
+            Directory.CreateDirectory(dst);
+            foreach (var file in Directory.GetFiles(src))
+            {
+                var destFile = Path.Combine(dst, Path.GetFileName(file));
+                File.Copy(file, destFile, true);
+                copiedFiles++;
+                progressCallback?.Invoke((double) copiedFiles / totalFiles * 100.0);
+            }
+            foreach (var dir in Directory.GetDirectories(src))
+            {
+                var destSubDir = Path.Combine(dst, Path.GetFileName(dir));
+                CopyRecursive(dir, destSubDir);
+            }
+        }
+        CopyRecursive(sourceDir, destDir);
     }
 }
