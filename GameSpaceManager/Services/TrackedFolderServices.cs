@@ -50,6 +50,13 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
                     Directory.Delete(folderToArchive.FullPath, true);
                 }
             }
+                }
+                else
+                {
+                    CopyDirectoryRecursively(folderToArchive.FullPath, archivePath, progressCallback);
+                    Directory.Delete(folderToArchive.FullPath, true);
+                }
+            }
 <<<<<<< HEAD
             }
 =======
