@@ -36,11 +36,16 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
         {
             // Move the folder to the archive location
             if (Directory.Exists(folderToArchive.FullPath))
-                Directory.Move(folderToArchive.FullPath, archivePath);
+            {
+                CopyDirectory(folderToArchive.FullPath, archivePath);
+                Directory.Delete(folderToArchive.FullPath, true);
+            }
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             // Delete the tracked folder entry if the move fails
+            Directory.Delete(archivePath, true);
             store.Remove(trackedFolder);
             await store.SaveAsync();
             return null;
@@ -71,7 +76,11 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
                 Directory.Delete(trackedFolder.OriginalPath, true);
 
             // Move the folder back to its original location
-            Directory.Move(trackedFolder.ArchivePath, trackedFolder.OriginalPath);
+            if (!Directory.Exists(trackedFolder.OriginalPath))
+                Directory.CreateDirectory(trackedFolder.OriginalPath);
+
+            CopyDirectory(trackedFolder.ArchivePath, trackedFolder.OriginalPath);
+            Directory.Delete(trackedFolder.ArchivePath, true);
         }
         catch (Exception)
         {
@@ -89,5 +98,27 @@ public class TrackedFolderServices(IStore store, IDestinationFolderService desti
     public IQueryable<TrackedFolderEntity> GetTrackedFolders()
     {
         return store.TrackedFolderRepository.QueryMany();
+    }
+
+    /// <summary>
+    /// Copies all files and subdirectories from the source directory to the destination directory.
+    /// </summary>
+    /// <param name="sourceDir">The source directory to copy from.</param>
+    /// <param name="destDir">The destination directory to copy to.</param>
+    private static void CopyDirectory(string sourceDir, string destDir)
+    {
+        Directory.CreateDirectory(destDir);
+
+        foreach (var file in Directory.GetFiles(sourceDir))
+        {
+            var destFile = Path.Combine(destDir, Path.GetFileName(file));
+            File.Copy(file, destFile, true);
+        }
+
+        foreach (var dir in Directory.GetDirectories(sourceDir))
+        {
+            var destSubDir = Path.Combine(destDir, Path.GetFileName(dir));
+            CopyDirectory(dir, destSubDir);
+        }
     }
 }
