@@ -1,9 +1,6 @@
-using System.Windows;
 using Windows.UI.Core;
-using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml.Controls;
 
-namespace GameSpaceManager.Presentation.ManagerPage
+namespace GameSpaceManager.Presentation.Shared
 {
     public partial class ProgressDialog : ContentDialog
     {
