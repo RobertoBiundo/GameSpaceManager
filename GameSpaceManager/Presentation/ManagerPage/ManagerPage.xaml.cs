@@ -106,22 +106,56 @@ public sealed partial class ManagerPage : Page
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ArchiveOrRestore_Click(object sender, RoutedEventArgs e)
+    private async void ArchiveOrRestore_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button { Tag: FolderItemModel folderItem })
             return;
 
-        if (folderItem.IsArchived)
+        var action = folderItem.IsArchived ? "Restoring" : "Archiving";
+        var progressDialog = new ProgressDialog($"{action} '{folderItem.Name}'...")
         {
-            var success = _trackedFolderService.RestoreFolder(folderItem).Result;
-            Console.WriteLine(success ? $"Folder '{folderItem.Name}' restored successfully." : $"Failed to restore folder '{folderItem.Name}'");
+            XamlRoot = this.XamlRoot
+        };
+        progressDialog.ShowAsync();
+
+        bool success;
+        try
+        {
+            if (folderItem.IsArchived)
+            {
+                success = await Task.Run(() =>
+                    _trackedFolderService.RestoreFolder(folderItem, (percent) =>
+                        progressDialog.UpdateProgress(percent, $"Restoring '{folderItem.Name}'... {percent:F0}%")));
+            }
+            else
+            {
+                var archivedFolder = await Task.Run(() =>
+                    _trackedFolderService.ArchiveFolder(folderItem, (percent) =>
+                        progressDialog.UpdateProgress(percent, $"Archiving '{folderItem.Name}'... {percent:F0}%")));
+                success = archivedFolder != null;
+            }
         }
-        else
+        finally
         {
-            var archivedFolder = _trackedFolderService.ArchiveFolder(folderItem).Result;
-            Console.WriteLine(archivedFolder != null ? $"Folder '{folderItem.Name}' archived successfully." : $"Failed to archive folder '{folderItem.Name}'");
+            progressDialog.Hide();
         }
 
+        var resultMsg = success
+            ? $"{action} of folder '{folderItem.Name}' completed successfully."
+            : $"Failed to {action.ToLower()} folder '{folderItem.Name}'.";
+        await ShowMessageDialogAsync(resultMsg, action);
         LoadFolders();
+    }
+
+    private async Task ShowMessageDialogAsync(string message, string title)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = message,
+            CloseButtonText = "OK",
+            XamlRoot = XamlRoot
+        };
+        await dialog.ShowAsync();
     }
 }
