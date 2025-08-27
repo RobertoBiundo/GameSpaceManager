@@ -147,6 +147,11 @@ public sealed partial class ManagerPage : Page
         LoadFolders();
     }
 
+    /// <summary>
+    ///     A helper method to show a message dialog
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="title"></param>
     private async Task ShowMessageDialogAsync(string message, string title)
     {
         var dialog = new ContentDialog
